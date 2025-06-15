@@ -33,6 +33,8 @@ class Editor:
         }
         self.bg = {
             'day_bg' : load_image_folder('background/day'),
+            'industrial_day_bg' : load_image_folder('background/industrial_day'),
+            'industrial_night_bg' : load_image_folder('background/industrial_night'),
         }
 
         self.tile_list = list(self.assets)

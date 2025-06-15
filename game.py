@@ -35,6 +35,8 @@ class Game():
             'bushes' : load_image_folder('tiles/bushes'),
             'enemy_spawner' : load_image_folder('tiles/enemy_spawner'),
             'day_bg' : load_image_folder('background/day'),
+            'industrial_day_bg' : load_image_folder('background/industrial_day'),
+            'industrial_night_bg' : load_image_folder('background/industrial_night'),
         }
         self.tilemap = Tilemap(self)
         self.scroll = [0, 0]
