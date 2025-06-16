@@ -14,9 +14,11 @@ class PhysicsEntity:
         self.set_action('idle')
         self.last_movement = [0, 0]
 
+    #Creates a rect object around the entity
     def rect(self):
         return pygame.Rect(self.pos[0], self.pos[1], self.size[0], self.size[1])
     
+    #Sets the action of the entity
     def set_action(self, action):
         if action != self.action:
             self.action = action
@@ -122,6 +124,7 @@ class PlayerEntity(PhysicsEntity):
         elif self.dash < 0:
             self.dash = min(0, self.dash + 1)
 
+        #Dash only last 10 frames, last 50 frames is cooldown
         if abs(self.dash) > 50:
             self.velocity[0] = abs(self.dash) / self.dash * 8
             if abs(self.dash) == 51:

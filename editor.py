@@ -97,7 +97,8 @@ class Editor:
                     tile_rect = pygame.Rect(tile['pos'][0] - self.scroll[0], tile['pos'][1] - self.scroll[1], tile_type.get_width(), tile_type.get_height())
                     if tile_rect.collidepoint(mouse_pos):
                         self.tilemap.offgrid_tiles.remove(tile)
-                
+
+            #Key and Mouse Inputs    
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()

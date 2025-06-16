@@ -5,6 +5,7 @@ from scripts.utils import load_image, load_image_folder, load_sprite_sheet, crop
 from scripts.tilemap import Tilemap
 
 class Game():
+    #Colours
     black = 0, 0, 0
     white = 255, 255, 255
 
@@ -43,6 +44,9 @@ class Game():
 
         self.tilemap.load('maps/map.json')
 
+        self.tilemap.extract_tile('enemy_spawner', 0, False)
+        self.tilemap.extract_tile('enemy_spawner', 1, False)
+
         #Player Details
         self.player = PlayerEntity(self, (50, 100), (12, 24))
         self.h_movement = [False, False]
@@ -65,6 +69,7 @@ class Game():
 
             pygame.display.flip()
 
+            #Key Inputs
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()

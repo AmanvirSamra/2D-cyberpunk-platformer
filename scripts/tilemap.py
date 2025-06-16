@@ -12,6 +12,7 @@ class Tilemap:
         self.tilemap = {}
         self.offgrid_tiles = []
 
+    #Determines what tiles are around the player and returns a list of them
     def neighbour_tiles(self, pos):
         tiles = []
         tile_pos = (int(pos[0] // self.tile_size), int(pos[1] // self.tile_size))
@@ -21,6 +22,7 @@ class Tilemap:
                 tiles.append(self.tilemap[offset_loc])
         return tiles
     
+    #Determines which tiles around player are physical entities and returns a list of them
     def physics_tile_rect(self, pos):
         rects = []
         for tile in self.neighbour_tiles(pos):
@@ -28,11 +30,13 @@ class Tilemap:
                 rects.append(pygame.Rect(tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size, self.tile_size, self.tile_size))
         return rects
     
+    #Save map changes
     def save(self, path):
         f = open(path, 'w')
         json.dump({'tilemap': self.tilemap, 'tile_size': self.tile_size, "offgrid": self.offgrid_tiles}, f)
         f.close()
     
+    #Load map
     def load(self, path):
         f = open(path, 'r')
         map_data = json.load(f)
@@ -42,13 +46,18 @@ class Tilemap:
         self.tile_size = map_data['tile_size']
         self.offgrid_tiles = map_data['offgrid']
 
+    #Extracts all tiles of a certain type and variant
     def extract_tile(self, tile_type, tile_variant, keep):
         tiles = []
-        for tile in self.tilemap:
+        for tile_pos in list(self.tilemap):
+            tile = self.tilemap[tile_pos]
             if tile['type'] == tile_type and tile['variant'] == tile_variant:
-                tiles.append(tile['pos'])
+                tiles.append(tile.copy())
+                tiles[-1]['pos'] = tiles[-1]['pos'].copy()
+                tiles[-1]['pos'][0] *= self.tile_size
+                tiles[-1]['pos'][1] *= self.tile_size
                 if not keep:
-                    del self.tilemap[str(tile['pos'][0]) + ':' + str(tile['pos'][1])]
+                    del self.tilemap[tile_pos]
         pass
 
     def render(self, dis, offset):
