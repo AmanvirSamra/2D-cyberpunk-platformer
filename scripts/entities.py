@@ -146,6 +146,7 @@ class PlayerEntity(PhysicsEntity):
         elif self.jumps == 2:
             if(self.air_time > 4):
                 self.jumps -= 1
+                self.second_jump = True
             self.velocity[1] = -3
             self.jumps -= 1
             self.air_time = 5
