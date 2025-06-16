@@ -1,5 +1,6 @@
 import pygame
 import sys
+import random
 from scripts.entities import PhysicsEntity, PlayerEntity, EnemyEntity
 from scripts.utils import load_image, load_image_folder, load_sprite_sheet, crop_player, Animation
 from scripts.tilemap import Tilemap
@@ -22,7 +23,7 @@ class Game():
             'player/run' : Animation(crop_player(load_sprite_sheet('entities/player/player_sprite_sheet.png', 32, 32, 8, 3)), 4),
             'player/jump' : Animation(crop_player(load_sprite_sheet('entities/player/player_sprite_sheet.png', 32, 32, 5, 4)), 10, False),
             'player/double_jump' : Animation(crop_player(load_sprite_sheet('entities/player/player_sprite_sheet.png', 32, 32, 6, 5)), 6, False),
-            'player/wall_slide' : Animation(crop_player(load_sprite_sheet('entities/player/player_sprite_sheet.png', 32, 32, 4, 6), 10, 7, 12), 5, False),
+            'player/wall_slide' : Animation(crop_player(load_sprite_sheet('entities/player/player_sprite_sheet.png', 32, 32, 4, 6), 11, 7, 10), 5, False),
             'player/dash_attack' : Animation(crop_player(load_sprite_sheet('entities/player/player_sprite_sheet.png', 32, 32, 4, 15)), 3, False),
             'player/death' : Animation(crop_player(load_sprite_sheet('entities/player/player_sprite_sheet.png', 32, 32, 8, 17)), 5, False),
             'enemy/idle' : Animation(crop_player(load_sprite_sheet('entities/enemy/enemy_sprite_sheet.png', 32, 32, 6, 9), 3, width = 20), 5),
@@ -44,14 +45,19 @@ class Game():
             'industrial_night_bg' : load_image_folder('background/industrial_night'),
             'projectile' : load_image('particles/projectile.png'),
             'player_spawner' : load_image_folder('tiles/player_spawner'),
+            'goal' : load_image_folder('tiles/goal'),
         }
         self.tilemap = Tilemap(self)
 
+        self.screenshake = 0
+
         #Player Details
-        self.player = PlayerEntity(self, (50, 100), (12, 24))
+        self.player = PlayerEntity(self, (50, 100), (10, 24))
         self.h_movement = [False, False]
 
-        self.load_level('map')
+        self.level = 1
+
+        self.load_level(self.level)
 
     def load_level(self, mapID):
         self.tilemap.load('data/maps/' + str(mapID) + '.json')
@@ -70,8 +76,13 @@ class Game():
         for spawner in self.tilemap.extract_tile('enemy_spawner', 1, False):
             self.enemies.append(EnemyEntity(self, spawner['pos'], (16, 24)))
 
+        for goal in self.tilemap.extract_tile('goal', 0, True):
+            self.goal_pos = goal['pos']
+
         self.projectiles = []
         self.dead = 0
+        self.transition = -30
+        self.goal_reached = False
 
     def run(self):
         while True:
@@ -79,7 +90,19 @@ class Game():
             if self.dead:
                 self.dead += 1
                 if self.dead > 60:
-                    self.load_level('map')
+                    self.load_level(self.level)
+
+            #Check if player is at finish line and transition to next level
+            if self.player.rect().colliderect(pygame.Rect(self.goal_pos[0], self.goal_pos[1], 32, 32)):
+                self.goal_reached = True
+            
+            if self.goal_reached:
+                self.transition += 1
+                if self.transition > 30:
+                    self.level += 1
+                    self.load_level(self.level)
+            if self.transition < 0:
+                self.transition += 1
 
             #Refresh Screen
             for bg in self.assets['day_bg']:
@@ -90,6 +113,9 @@ class Game():
 
             self.tilemap.render(self.display, self.scroll)
             
+            if self.screenshake:
+                self.screenshake = max(0, self.screenshake - 1)
+
             for enemy in self.enemies.copy():
                 dead = enemy.update(self.tilemap, (0, 0))
                 enemy.render(self.display, self.scroll)
@@ -114,10 +140,17 @@ class Game():
                     self.projectiles.remove(projectile)
                 elif abs(self.player.dash) < 50:
                     if self.player.rect().collidepoint(projectile['pos']):
+                        self.screenshake = max(24, self.screenshake)
                         self.projectiles.remove(projectile)
                         self.dead += 1
-                        
-            self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0,0))
+            if self.transition:
+                transition_circle = pygame.Surface(self.display.get_size())
+                pygame.draw.circle(transition_circle, self.white, (self.display.get_width() // 2, self.display.get_height() // 2), (30 - abs(self.transition)) * 16)
+                transition_circle.set_colorkey(self.white)
+                self.display.blit(transition_circle, (0, 0))
+
+            screenshake_offset = (random.random() * self.screenshake - self.screenshake / 2, random.random() * self.screenshake - self.screenshake / 2)
+            self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), screenshake_offset)
 
             pygame.display.flip()
 

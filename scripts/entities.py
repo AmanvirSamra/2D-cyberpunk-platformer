@@ -86,7 +86,9 @@ class PlayerEntity(PhysicsEntity):
     def update(self, tilemap, movement=(0, 0), dead = False):
         super().update(tilemap, movement)
 
-        if self.air_time > 150:
+        if self.air_time > 300:
+            if not self.game.dead:
+                self.game.screenshake = max(24, self.game.screenshake)
             self.game.dead += 1
 
         if not dead:
@@ -198,6 +200,7 @@ class EnemyEntity(PhysicsEntity):
 
         if abs(self.game.player.dash) >= 50 and not self.dead:
             if self.rect().colliderect(self.game.player.rect()):
+                self.game.screenshake = max(24, self.game.screenshake)
                 self.dead = True
             
         if self.dead:
