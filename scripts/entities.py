@@ -1,3 +1,5 @@
+import random
+
 import pygame
 
 class PhysicsEntity:
@@ -22,7 +24,7 @@ class PhysicsEntity:
     def set_action(self, action):
         if action != self.action:
             self.action = action
-            self.animaton = self.game.assets[self.type + '/' + self.action].copy()
+            self.animation = self.game.assets[self.type + '/' + self.action].copy()
     
     def update(self, tilemap, movement=(0, 0)):
         self.collisions = {"Left": False, "Right": False, "Top": False, "Bottom": False}
@@ -65,12 +67,12 @@ class PhysicsEntity:
 
         self.last_movement = movement
 
-        self.animaton.update()
+        self.animation.update()
             
 
     def render(self, dis, offset):
         # pygame.draw.rect(dis, (255, 0, 0), pygame.Rect(self.pos[0] - offset[0], self.pos[1] - offset[1], self.size[0], self.size[1]), 1)
-        dis.blit(pygame.transform.flip(self.animaton.img(), self.flip, False), (self.pos[0] - offset[0], self.pos[1] - offset[1]))
+        dis.blit(pygame.transform.flip(self.animation.img(), self.flip, False), (self.pos[0] - offset[0], self.pos[1] - offset[1]))
 
 class PlayerEntity(PhysicsEntity):
     def __init__(self, game, pos, size):
@@ -81,54 +83,60 @@ class PlayerEntity(PhysicsEntity):
         self.wall_slide = False
         self.dash = False
 
-    def update(self, tilemap, movement=(0, 0)):
+    def update(self, tilemap, movement=(0, 0), dead = False):
         super().update(tilemap, movement)
 
-        self.air_time += 1
-        if self.collisions['Bottom']:
-            self.air_time = 0
-            self.jumps = 2
-            self.second_jump = False
+        if self.air_time > 150:
+            self.game.dead += 1
 
-        self.wall_slide = False
-        if(self.collisions['Right'] or self.collisions['Left']) and self.air_time > 4:
-            self.wall_slide = True
-            self.velocity[1] = min(self.velocity[1], 0.5)
+        if not dead:
+            self.air_time += 1
+            if self.collisions['Bottom']:
+                self.air_time = 0
+                self.jumps = 2
+                self.second_jump = False
 
-            if self.collisions['Right']:
-                self.flip = True
+            self.wall_slide = False
+            if(self.collisions['Right'] or self.collisions['Left']) and self.air_time > 4:
+                self.wall_slide = True
+                self.velocity[1] = min(self.velocity[1], 0.5)
+
+                if self.collisions['Right']:
+                    self.flip = True
+                else:
+                    self.flip = False
+
+                self.set_action('wall_slide')
+
+            if self.velocity[0] > 0:
+                self.velocity[0] = max(0, self.velocity[0] - 0.1)
             else:
-                self.flip = False
+                self.velocity[0] = min(0, self.velocity[0] + 0.1)
+            
+            if not self.wall_slide:
+                if abs(self.dash) > 40:
+                    self.set_action('dash_attack')
+                elif self.second_jump:
+                    self.set_action('double_jump')
+                elif self.air_time > 4:
+                    self.set_action('jump')
+                elif movement[0] != 0:
+                    self.set_action('run')
+                else:
+                    self.set_action('idle')
+            
+            if self.dash > 0:
+                self.dash = max(0, self.dash - 1)
+            elif self.dash < 0:
+                self.dash = min(0, self.dash + 1)
 
-            self.set_action('wall_slide')
-
-        if self.velocity[0] > 0:
-            self.velocity[0] = max(0, self.velocity[0] - 0.1)
+            #Dash only last 10 frames, last 50 frames is cooldown
+            if abs(self.dash) > 50:
+                self.velocity[0] = abs(self.dash) / self.dash * 8
+                if abs(self.dash) == 51:
+                    self.velocity[0] *= 0.1
         else:
-            self.velocity[0] = min(0, self.velocity[0] + 0.1)
-        
-        if not self.wall_slide:
-            if abs(self.dash) > 40:
-                self.set_action('dash_attack')
-            elif self.second_jump:
-                self.set_action('double_jump')
-            elif self.air_time > 4:
-                self.set_action('jump')
-            elif movement[0] != 0:
-                self.set_action('run')
-            else:
-                self.set_action('idle')
-        
-        if self.dash > 0:
-            self.dash = max(0, self.dash - 1)
-        elif self.dash < 0:
-            self.dash = min(0, self.dash + 1)
-
-        #Dash only last 10 frames, last 50 frames is cooldown
-        if abs(self.dash) > 50:
-            self.velocity[0] = abs(self.dash) / self.dash * 8
-            if abs(self.dash) == 51:
-                self.velocity[0] *= 0.1
+            self.set_action('death')
 
     def jump(self):
         if self.wall_slide:
@@ -161,3 +169,46 @@ class PlayerEntity(PhysicsEntity):
                 self.dash = 60
             else:
                 self.dash = -60
+
+class EnemyEntity(PhysicsEntity):
+    def __init__(self, game, pos, size):
+        super().__init__(game, 'enemy', pos, size)
+
+        self.walk_time = 0
+        self.dead = False
+
+    def update(self, tilemap, movement=(0, 0)):
+        if self.walk_time:
+            if tilemap.check_solid_tile((self.rect().centerx + (12 if self.flip else -12), self.pos[1] + 32)) and not tilemap.check_solid_tile((self.rect().centerx + (12 if self.flip else -12), self.pos[1])):
+                movement = (0 if self.dead else (movement[0] + (0.5 if self.flip else -0.5)), movement[1])
+            else:
+                self.flip = not self.flip
+            self.walk_time = max(0, self.walk_time - 1)
+            if not self.walk_time:
+                distance = (self.game.player.pos[0] - self.pos[0], self.game.player.pos[1] - self.pos[1])
+                if abs(distance[1] < 20):
+                    if not self.flip and distance[0] < 0:
+                        self.game.projectiles.append({ 'pos' : [self.rect().centerx - 7, self.rect().centery + 3], 'direction' : -2, 'duration' : 0})
+                    elif self.flip and distance[0] > 0:
+                        self.game.projectiles.append({ 'pos' : [self.rect().centerx + 7, self.rect().centery + 3], 'direction' : 2, 'duration' : 0})
+
+
+        elif random.random() < 0.01:
+            self.walk_time = random.randint(15, 180)
+
+        if abs(self.game.player.dash) >= 50 and not self.dead:
+            if self.rect().colliderect(self.game.player.rect()):
+                self.dead = True
+            
+        if self.dead:
+            self.set_action('death')
+        elif movement[0] == 0:
+            self.set_action('idle')
+        else:
+            self.set_action('walk')
+        
+        if self.action == 'death' and self.animation.done:
+            return True
+
+
+        super().update(tilemap, movement)

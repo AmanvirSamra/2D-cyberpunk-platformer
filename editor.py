@@ -30,6 +30,7 @@ class Editor:
             'trees' : load_image_folder('tiles/trees'),
             'bushes' : load_image_folder('tiles/bushes'),
             'enemy_spawner' : load_image_folder('tiles/enemy_spawner'),
+            'player_spawner' : load_image_folder('tiles/player_spawner'),
         }
         self.bg = {
             'day_bg' : load_image_folder('background/day'),
@@ -52,7 +53,7 @@ class Editor:
         self.offgrid = False
 
         try:
-            self.tilemap.load('maps/map.json')
+            self.tilemap.load('data/maps/map.json')
         except FileNotFoundError:
             pass
     
@@ -144,7 +145,7 @@ class Editor:
                     if event.key == pygame.K_x:
                         self.offgrid = not self.offgrid
                     if event.key == pygame.K_s:
-                        self.tilemap.save('maps/map.json')
+                        self.tilemap.save('data/maps/map.json')
 
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT:

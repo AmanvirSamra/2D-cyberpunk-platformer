@@ -1,6 +1,6 @@
 import pygame
 import sys
-from scripts.entities import PhysicsEntity, PlayerEntity
+from scripts.entities import PhysicsEntity, PlayerEntity, EnemyEntity
 from scripts.utils import load_image, load_image_folder, load_sprite_sheet, crop_player, Animation
 from scripts.tilemap import Tilemap
 
@@ -24,6 +24,10 @@ class Game():
             'player/double_jump' : Animation(crop_player(load_sprite_sheet('entities/player/player_sprite_sheet.png', 32, 32, 6, 5)), 6, False),
             'player/wall_slide' : Animation(crop_player(load_sprite_sheet('entities/player/player_sprite_sheet.png', 32, 32, 4, 6), 10, 7, 12), 5, False),
             'player/dash_attack' : Animation(crop_player(load_sprite_sheet('entities/player/player_sprite_sheet.png', 32, 32, 4, 15)), 3, False),
+            'player/death' : Animation(crop_player(load_sprite_sheet('entities/player/player_sprite_sheet.png', 32, 32, 8, 17)), 5, False),
+            'enemy/idle' : Animation(crop_player(load_sprite_sheet('entities/enemy/enemy_sprite_sheet.png', 32, 32, 6, 9), 3, width = 20), 5),
+            'enemy/walk' : Animation(crop_player(load_sprite_sheet('entities/enemy/enemy_sprite_sheet.png', 32, 32, 6, 10), 3, width = 20), 5),
+            'enemy/death' : Animation(crop_player(load_sprite_sheet('entities/enemy/enemy_sprite_sheet.png', 32, 32, 8, 19), 3, width = 20), 5, False),
             'mossy_stone' : load_image_folder('tiles/mossy_stone'),
             'stone' : load_image_folder('tiles/stone'),
             'brick' : load_image_folder('tiles/bricks'),
@@ -38,21 +42,45 @@ class Game():
             'day_bg' : load_image_folder('background/day'),
             'industrial_day_bg' : load_image_folder('background/industrial_day'),
             'industrial_night_bg' : load_image_folder('background/industrial_night'),
+            'projectile' : load_image('particles/projectile.png'),
+            'player_spawner' : load_image_folder('tiles/player_spawner'),
         }
         self.tilemap = Tilemap(self)
-        self.scroll = [0, 0]
-
-        self.tilemap.load('maps/map.json')
-
-        self.tilemap.extract_tile('enemy_spawner', 0, False)
-        self.tilemap.extract_tile('enemy_spawner', 1, False)
 
         #Player Details
         self.player = PlayerEntity(self, (50, 100), (12, 24))
         self.h_movement = [False, False]
 
+        self.load_level('map')
+
+    def load_level(self, mapID):
+        self.tilemap.load('data/maps/' + str(mapID) + '.json')
+
+        self.scroll = [0, 0]
+
+        self.enemies = []
+
+        for spawner in self.tilemap.extract_tile('player_spawner', 0, False):
+            self.player.pos = spawner['pos']
+            self.player.air_time = 0
+
+        for spawner in self.tilemap.extract_tile('enemy_spawner', 0, False):
+            self.enemies.append(EnemyEntity(self, spawner['pos'], (16, 24)))
+
+        for spawner in self.tilemap.extract_tile('enemy_spawner', 1, False):
+            self.enemies.append(EnemyEntity(self, spawner['pos'], (16, 24)))
+
+        self.projectiles = []
+        self.dead = 0
+
     def run(self):
         while True:
+            #Restart level after death
+            if self.dead:
+                self.dead += 1
+                if self.dead > 60:
+                    self.load_level('map')
+
             #Refresh Screen
             for bg in self.assets['day_bg']:
                 self.display.blit(pygame.transform.scale(bg, self.display.get_size()), (0,0))
@@ -62,9 +90,33 @@ class Game():
 
             self.tilemap.render(self.display, self.scroll)
             
-            self.player.update(self.tilemap, (self.h_movement[1] - self.h_movement[0], 0))
-            self.player.render(self.display, self.scroll)
+            for enemy in self.enemies.copy():
+                dead = enemy.update(self.tilemap, (0, 0))
+                enemy.render(self.display, self.scroll)
+                if dead:
+                    self.enemies.remove(enemy)
+            
+            if not self.dead:
+                self.player.update(self.tilemap, (self.h_movement[1] - self.h_movement[0], 0))
+                self.player.render(self.display, self.scroll)
+            else:
+                self.player.update(self.tilemap, (self.h_movement[1] - self.h_movement[0], 0), True)
+                self.player.render(self.display, self.scroll)
 
+            for projectile in self.projectiles.copy():
+                projectile['pos'][0] += projectile['direction']
+                projectile['duration'] += 1
+                img = self.assets['projectile']
+                self.display.blit(img, (projectile['pos'][0] - img.get_width() / 2 - self.scroll[0], projectile['pos'][1] - img.get_height() / 2 - self.scroll[1]))
+                if self.tilemap.check_solid_tile(projectile['pos']):
+                    self.projectiles.remove(projectile)
+                elif projectile['duration'] > 600:
+                    self.projectiles.remove(projectile)
+                elif abs(self.player.dash) < 50:
+                    if self.player.rect().collidepoint(projectile['pos']):
+                        self.projectiles.remove(projectile)
+                        self.dead += 1
+                        
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0,0))
 
             pygame.display.flip()

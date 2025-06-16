@@ -58,7 +58,14 @@ class Tilemap:
                 tiles[-1]['pos'][1] *= self.tile_size
                 if not keep:
                     del self.tilemap[tile_pos]
-        pass
+        return tiles
+    
+    def check_solid_tile(self, pos):
+        tile_pos = str(int(pos[0] // self.tile_size)) + ';' + str(int(pos[1] // self.tile_size))
+        if tile_pos in self.tilemap:
+            if self.tilemap[tile_pos]['type'] in PHYSICS_TILES:
+                return True
+        return False
 
     def render(self, dis, offset):
         for off_tile in self.offgrid_tiles:
