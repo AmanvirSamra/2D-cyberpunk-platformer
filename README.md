@@ -59,10 +59,42 @@ pixelated-perry/
 
 ## Future Improvements
 - Sound effects and music (In Progress)
-- Map Builder (Partially completed (See below))
+- Map Builder (Partially completed - See below)
 - More Enemy types and behaviours
 - Heath System
 - Gamepad & Voice Support
+
+#### Running Map Builder
+1. ⚠️ Currently, the map builder requires **manual editing of the code** to specify which level file to load or save.  
+2. Open `editor.py` and modify the `MAP_ID` or file path variable near the top to match the level you're editing (e.g., `"data/maps/1.json"`).
+3. If you're creating a new map, open the `data/maps` folder and check the highest number (e.g., `5.json`).  
+   Then set the new file to the next number (e.g., `MAP_ID = 6`) to ensure it runs properly.
+
+#### Requirements
+- Python 3.8+
+
+#### Installation Instructions
+```
+git clone https://github.com/AmanvirSamra/2D-cyberpunk-platformer.git
+cd 2D-cyberpunk-platformer
+python pip install -r requirements.text
+```
+
+#### Start the editor
+```
+python .\editor.py
+```
+
+#### 🎮 Controls
+
+| Key      | Action                |
+|----------|-----------------------|
+| ← / →    | Move left / right     |
+| ↑ / ↓    | Move up / down        |
+| X        | Toggle grid placement |
+| S        | Save Level            |
+| Scroll   | Switch Tile type      |
+| Scroll+LShift   | Switch Tile variant  |
 
 ## Acknowledgments
 - [Chroma-Dave](https://chroma-dave.itch.io/neon-city-pixel-art-pack-main-character-1) - For player and enemy sprites

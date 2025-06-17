@@ -5,6 +5,7 @@ from scripts.utils import load_image, load_image_folder, load_sprite_sheet
 from scripts.tilemap import Tilemap
 
 RENDER_SCALE = 2.0
+MAP_ID = 2
 
 class Editor:
     black = 0, 0, 0
@@ -54,7 +55,7 @@ class Editor:
         self.offgrid = False
 
         try:
-            self.tilemap.load('data/maps/2.json')
+            self.tilemap.load('data/maps/' + str(MAP_ID) + '.json')
         except FileNotFoundError:
             pass
     
@@ -146,7 +147,7 @@ class Editor:
                     if event.key == pygame.K_x:
                         self.offgrid = not self.offgrid
                     if event.key == pygame.K_s:
-                        self.tilemap.save('data/maps/2.json')
+                        self.tilemap.save('data/maps/' + str(MAP_ID) + '.json')
 
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT:
