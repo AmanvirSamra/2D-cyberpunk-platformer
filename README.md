@@ -2,7 +2,12 @@
 A 2D pixel-art platformer built in Python using Pygame. Make your way through increasingly challenging levels and defeat enemies along the way.
 
 ### Screenshots
-- Placeholder
+**Title Screen**
+![Title Screen](data/screenshots/Title_Screen.PNG)
+**Movement & Level Transition**
+![Title Screen](data/screenshots/Wall_jump.gif)
+**Death Animation**
+![Title Screen](data/screenshots/Death_animation.gif)
 
 ### Features
 - Platform Mechanics (run, jump, wall-slide/jump, dash attack)
