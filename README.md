@@ -1,10 +1,10 @@
 ## Pixelated Perry
 A 2D pixel-art platformer built in Python using Pygame. Make your way through increasingly challenging levels and defeat enemies along the way.
 
-### 📸 Screenshots
+### Screenshots
 - Placeholder
 
-### 🚀 Features
+### Features
 - Platform Mechanics (run, jump, wall-slide/jump, dash attack)
 - Sprite-based animation system
 - Enemy AI
@@ -12,7 +12,7 @@ A 2D pixel-art platformer built in Python using Pygame. Make your way through in
 - Visual Effects (Projectiles, Level Transitions, Screenshake)
 - Start and End Screens
 
-## 🕹️ Run the Game
+## Run the Game
 
 ### Requirements
 - Python 3.8+
@@ -29,7 +29,7 @@ python pip install -r requirements.text
 python .\game.py
 ```
 
-## 🎮 Controls
+## Controls
 
 | Key      | Action                |
 |----------|-----------------------|
@@ -39,7 +39,7 @@ python .\game.py
 | R        | Restart (end screen)  |
 | Any key  | Start game            |
 
-## 📁 Project Structure
+## Project Structure
 ```
 pixelated-perry/
 
@@ -73,22 +73,12 @@ pixelated-perry/
 3. If you're creating a new map, open the `data/maps` folder and check the highest number (e.g., `5.json`).  
    Then set the new file to the next number (e.g., `MAP_ID = 6`) to ensure it runs properly.
 
-#### Requirements
-- Python 3.8+
-
-#### Installation Instructions
-```
-git clone https://github.com/AmanvirSamra/2D-cyberpunk-platformer.git
-cd 2D-cyberpunk-platformer
-python pip install -r requirements.text
-```
-
-#### Start the editor
+#### To start the editor
 ```
 python .\editor.py
 ```
 
-#### 🎮 Controls
+#### Controls
 
 | Key      | Action                |
 |----------|-----------------------|
