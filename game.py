@@ -61,7 +61,7 @@ class Game():
         self.player = PlayerEntity(self, (50, 100), (10, 24))
         self.h_movement = [False, False]
 
-        self.level = 2
+        self.level = 1
 
         self.load_level(self.level)
 
