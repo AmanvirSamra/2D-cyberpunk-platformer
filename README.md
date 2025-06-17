@@ -63,3 +63,8 @@ pixelated-perry/
 - More Enemy types and behaviours
 - Heath System
 - Gamepad & Voice Support
+
+## Acknowledgments
+- [Chroma-Dave](https://chroma-dave.itch.io/neon-city-pixel-art-pack-main-character-1) - For player and enemy sprites
+- [CraftPix](https://craftpix.net/) - For Tile and background images
+- [Pygame Community](https://www.pygame.org/) - For helpful documentation and tools
