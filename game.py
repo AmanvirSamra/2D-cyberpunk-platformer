@@ -133,6 +133,10 @@ class Game():
                 enemy.render(self.display, self.scroll)
                 if dead:
                     self.enemies.remove(enemy)
+                elif not enemy.dead and abs(self.player.dash) < 50 and self.player.rect().colliderect(enemy.rect()):
+                    self.screenshake = max(24, self.screenshake)
+                    self.dead += 1
+
             
             if not self.dead:
                 self.player.update(self.tilemap, (self.h_movement[1] - self.h_movement[0], 0))
@@ -155,6 +159,7 @@ class Game():
                         self.screenshake = max(24, self.screenshake)
                         self.projectiles.remove(projectile)
                         self.dead += 1
+
             if self.transition:
                 transition_circle = pygame.Surface(self.display.get_size())
                 pygame.draw.circle(transition_circle, self.white, (self.display.get_width() // 2, self.display.get_height() // 2), (30 - abs(self.transition)) * 16)
