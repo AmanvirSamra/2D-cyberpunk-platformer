@@ -42,11 +42,7 @@ python .\game.py
 ## 📁 Project Structure
 ```
 pixelated-perry/
-├── main.py # Main game loop
-├── scripts/
-│ ├── entities.py # Player, Enemy Classes
-│ ├── tilemap.py # Tilemap handling
-│ └── utils.py # Helpers for loading images/animations and levels
+
 ├── data/
 | └── maps/ # Level map JSON files
 | └── images/
@@ -54,7 +50,14 @@ pixelated-perry/
 │    ├── entities/ # Player and enemy sprite sheets
 │    ├── background/ # Background images
 │    └── particles/ # Projectile assets
-└── README.md # This file
+├── scripts/
+│ ├── entities.py # Player, Enemy Classes
+│ ├── tilemap.py # Tilemap handling
+│ └── utils.py # Helpers for loading images/animations and levels
+├── editor.py # Map Builder
+├── game.py # Main game loop
+├── README.md # This file
+└── Requirements.txt # Python dependencies (e.g., pygame)
 ```
 
 ## Future Improvements
