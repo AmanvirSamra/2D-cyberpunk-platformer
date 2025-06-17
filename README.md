@@ -94,6 +94,8 @@ python .\editor.py
 |----------|-----------------------|
 | ← / →    | Move left / right     |
 | ↑ / ↓    | Move up / down        |
+| Left Click    | Place Tile        |
+| Right Click    | Remove Tile        |
 | X        | Toggle grid placement |
 | S        | Save Level            |
 | Scroll   | Switch Tile type      |
