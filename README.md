@@ -17,6 +17,28 @@ A 2D pixel-art platformer built in Python using Pygame. Make your way through in
 - Visual Effects (Projectiles, Level Transitions, Screenshake)
 - Start and End Screens
 
+
+## Project Structure
+```
+pixelated-perry/
+
+├── data/
+| └── maps/ # Level map JSON files
+| └── images/
+|    ├── tiles/ # Tile images
+│    ├── entities/ # Player and enemy sprite sheets
+│    ├── background/ # Background images
+│    └── particles/ # Projectile assets
+├── scripts/
+│ ├── entities.py # Player, Enemy Classes
+│ ├── tilemap.py # Tilemap handling
+│ └── utils.py # Helpers for loading images/animations and levels
+├── editor.py # Map Builder
+├── game.py # Main game loop
+├── README.md # This file
+└── Requirements.txt # Python dependencies (e.g., pygame)
+```
+
 ## Run the Game
 
 ### Requirements
@@ -43,27 +65,6 @@ python .\game.py
 | X        | Dash Attack           |
 | R        | Restart (end screen)  |
 | Any key  | Start game            |
-
-## Project Structure
-```
-pixelated-perry/
-
-├── data/
-| └── maps/ # Level map JSON files
-| └── images/
-|    ├── tiles/ # Tile images
-│    ├── entities/ # Player and enemy sprite sheets
-│    ├── background/ # Background images
-│    └── particles/ # Projectile assets
-├── scripts/
-│ ├── entities.py # Player, Enemy Classes
-│ ├── tilemap.py # Tilemap handling
-│ └── utils.py # Helpers for loading images/animations and levels
-├── editor.py # Map Builder
-├── game.py # Main game loop
-├── README.md # This file
-└── Requirements.txt # Python dependencies (e.g., pygame)
-```
 
 ## Future Improvements
 - Sound effects and music (In Progress)
