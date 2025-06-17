@@ -59,13 +59,13 @@ class Game():
 
         #Player Details
         self.player = PlayerEntity(self, (50, 100), (10, 24))
-        self.h_movement = [False, False]
 
         self.level = 1
 
         self.load_level(self.level)
 
     def load_level(self, mapID):
+        self.h_movement = [False, False]
         self.tilemap.load('data/maps/' + str(mapID) + '.json')
 
         self.scroll = [0, 0]
