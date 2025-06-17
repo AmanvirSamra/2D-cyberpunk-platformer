@@ -186,7 +186,7 @@ class EnemyEntity(PhysicsEntity):
             else:
                 self.flip = not self.flip
             self.walk_time = max(0, self.walk_time - 1)
-            if not self.walk_time:
+            if not self.walk_time and not self.dead:
                 distance = (self.game.player.pos[0] - self.pos[0], self.game.player.pos[1] - self.pos[1])
                 if abs(distance[1] < 20) and abs(distance[0] < 320):
                     if not self.flip and distance[0] < 0:
