@@ -1,6 +1,8 @@
 import pygame
 import sys
 import random
+import os
+
 from scripts.entities import PhysicsEntity, PlayerEntity, EnemyEntity
 from scripts.utils import load_image, load_image_folder, load_sprite_sheet, crop_player, Animation
 from scripts.tilemap import Tilemap
@@ -12,12 +14,16 @@ class Game():
 
     def __init__(self):
         pygame.init()
+        pygame.font.init()
         
         #Game Setup
         self.screen = pygame.display.set_mode((1280, 720))
         self.display = pygame.Surface((640, 360))
         pygame.display.set_caption("Platformer")
         self.clock = pygame.time.Clock()
+        self.headerfont = pygame.font.SysFont('Times New Roman', 30)
+        self.subheaderfont = pygame.font.SysFont('Times New Roman', 15)
+
         self.assets = {
             'player/idle' : Animation(crop_player(load_sprite_sheet('entities/player/player_sprite_sheet.png', 32, 32, 12, 1)), 5),
             'player/run' : Animation(crop_player(load_sprite_sheet('entities/player/player_sprite_sheet.png', 32, 32, 8, 3)), 4),
@@ -55,7 +61,7 @@ class Game():
         self.player = PlayerEntity(self, (50, 100), (10, 24))
         self.h_movement = [False, False]
 
-        self.level = 1
+        self.level = 2
 
         self.load_level(self.level)
 
@@ -89,6 +95,8 @@ class Game():
             #Restart level after death
             if self.dead:
                 self.dead += 1
+                if self.dead >= 30:
+                    self.transition = min(30, self.transition + 1)
                 if self.dead > 60:
                     self.load_level(self.level)
 
@@ -100,7 +108,11 @@ class Game():
                 self.transition += 1
                 if self.transition > 30:
                     self.level += 1
-                    self.load_level(self.level)
+                    if self.level > len(os.listdir("data/maps")):
+                        self.end_screen()
+                        return
+                    else:
+                        self.load_level(self.level)
             if self.transition < 0:
                 self.transition += 1
 
@@ -136,7 +148,7 @@ class Game():
                 self.display.blit(img, (projectile['pos'][0] - img.get_width() / 2 - self.scroll[0], projectile['pos'][1] - img.get_height() / 2 - self.scroll[1]))
                 if self.tilemap.check_solid_tile(projectile['pos']):
                     self.projectiles.remove(projectile)
-                elif projectile['duration'] > 600:
+                elif projectile['duration'] > 240:
                     self.projectiles.remove(projectile)
                 elif abs(self.player.dash) < 50:
                     if self.player.rect().collidepoint(projectile['pos']):
@@ -178,4 +190,65 @@ class Game():
             #FPS
             self.clock.tick(60)
 
-Game().run()
+    def start_screen(self):
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    self.run()
+                    return
+
+            
+
+            for bg in self.assets['day_bg']:
+                self.display.blit(pygame.transform.scale(bg, self.display.get_size()), (0,0))
+
+            header_text_surface = self.headerfont.render('Pixelated Perry', False, self.white)
+            header_text_rect = header_text_surface.get_rect(center=(self.display.get_width() // 2, self.display.get_height() // 2))
+            
+            subheader_text_surface = self.subheaderfont.render('Press any key to start', False, self.white)
+            subheader_text_rect = subheader_text_surface.get_rect(center=(self.display.get_width() // 2, self.display.get_height() // 2 + 30))
+
+            self.display.blit(header_text_surface, header_text_rect)
+            self.display.blit(subheader_text_surface, subheader_text_rect)
+            self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()),(0, 0))
+            
+            pygame.display.flip()
+
+            self.clock.tick(60)
+
+    def end_screen(self):
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:
+                        self.level = 1
+
+                        self.load_level(self.level)
+                        self.run()
+                        return
+            
+            for bg in self.assets['day_bg']:
+                self.display.blit(pygame.transform.scale(bg, self.display.get_size()), (0,0))
+
+            header_text_surface = self.headerfont.render('Congratulations', False, self.white)
+            header_text_rect = header_text_surface.get_rect(center=(self.display.get_width() // 2, self.display.get_height() // 2))
+            
+            subheader_text_surface = self.subheaderfont.render('Press R to restart', False, self.white)
+            subheader_text_rect = subheader_text_surface.get_rect(center=(self.display.get_width() // 2, self.display.get_height() // 2 + 30))
+
+            self.display.blit(header_text_surface, header_text_rect)
+            self.display.blit(subheader_text_surface, subheader_text_rect)
+            self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()),(0, 0))
+            
+            pygame.display.flip()
+
+            self.clock.tick(60)
+
+
+Game().start_screen()

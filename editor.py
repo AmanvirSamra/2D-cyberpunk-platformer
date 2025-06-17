@@ -54,7 +54,7 @@ class Editor:
         self.offgrid = False
 
         try:
-            self.tilemap.load('data/maps/1.json')
+            self.tilemap.load('data/maps/2.json')
         except FileNotFoundError:
             pass
     
@@ -146,7 +146,7 @@ class Editor:
                     if event.key == pygame.K_x:
                         self.offgrid = not self.offgrid
                     if event.key == pygame.K_s:
-                        self.tilemap.save('data/maps/1.json')
+                        self.tilemap.save('data/maps/2.json')
 
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT:

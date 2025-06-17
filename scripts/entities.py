@@ -195,8 +195,8 @@ class EnemyEntity(PhysicsEntity):
                         self.game.projectiles.append({ 'pos' : [self.rect().centerx + 7, self.rect().centery + 3], 'direction' : 2, 'duration' : 0})
 
 
-        elif random.random() < 0.01:
-            self.walk_time = random.randint(15, 180)
+        elif random.random() < 0.03:
+            self.walk_time = random.randint(30, 180)
 
         if abs(self.game.player.dash) >= 50 and not self.dead:
             if self.rect().colliderect(self.game.player.rect()):
