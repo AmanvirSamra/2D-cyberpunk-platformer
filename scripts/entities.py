@@ -188,7 +188,7 @@ class EnemyEntity(PhysicsEntity):
             self.walk_time = max(0, self.walk_time - 1)
             if not self.walk_time:
                 distance = (self.game.player.pos[0] - self.pos[0], self.game.player.pos[1] - self.pos[1])
-                if abs(distance[1] < 20):
+                if abs(distance[1] < 20) and abs(distance[0] < 320):
                     if not self.flip and distance[0] < 0:
                         self.game.projectiles.append({ 'pos' : [self.rect().centerx - 7, self.rect().centery + 3], 'direction' : -2, 'duration' : 0})
                     elif self.flip and distance[0] > 0:
